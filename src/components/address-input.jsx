@@ -2,8 +2,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useMoralis, useMoralisWeb3Api } from "react-moralis";
 import { getEllipsisTxt } from "../helpers/formatters";
 import Blockie from "./blockie";
-import { FilledInput } from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
+import {
+  FilledInput,
+  InputAdornment,
+  InputLabel,
+  Box,
+  FormControl,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
+import { flexbox } from "@mui/system";
 
 export function AddressInput(props) {
   const input = useRef(null);
@@ -81,41 +90,62 @@ export function AddressInput(props) {
   );
 
   return (
-    <FilledInput
-      inputRef={input}
-      size="large"
-      fullWidth
-      placeholder={props.placeholder ? props.placeholder : "Address or ENS"}
-      startAdornment={
-        isDomain || address.length === 42 ? (
-          <Blockie
-            address={(isDomain ? validatedAddress : address).toLowerCase()}
-            size={8}
-            scale={3}
-          />
-        ) : (
-          <SearchIcon />
-        )
-      }
-      endAdornment={validatedAddress && <Cross />}
-      autoFocus={props.autoFocus}
-      value={
-        isDomain
-          ? `${address} (${getEllipsisTxt(validatedAddress)})`
-          : validatedAddress || address
-      }
-      onChange={(e) => {
-        updateAddress(e.target.value);
-      }}
-      disabled={validatedAddress}
-      disableUnderline
-      sx={
-        validatedAddress
-          ? { ...props?.style, border: "1px solid rgb(33, 191, 150)",  }
-          : { ...props?.style }
-      }
-      
-    />
+    <Box sx={{ width: '100%'}}>
+    
+      <FormControl fullWidth  variant="filled">
+        <InputLabel  htmlFor="filled-address-input">Recipient</InputLabel>
+        <FilledInput
+          id="filled-address-input"
+          type="text"
+          inputRef={input}
+          size="large"
+          
+          //fullWidth
+          placeholder={props.placeholder ? props.placeholder : "Address or ENS"}
+          startAdornment={
+            <InputAdornment position="start">
+            {isDomain || address.length === 42 ? (
+              <Blockie
+                address={(isDomain ? validatedAddress : address).toLowerCase()}
+                size={8}
+                scale={3}
+              />
+            ) : (
+              <SearchIcon />
+            )}
+            </InputAdornment>
+          }
+          endAdornment={ 
+            validatedAddress ? (
+              <Cross />
+            ) : (
+              <InputAdornment position="end" sx={{mt: '15px'}}>
+                <AccountBalanceWalletOutlinedIcon />
+                <KeyboardArrowRightIcon />
+              </InputAdornment>
+            )
+          }
+          autoFocus={props.autoFocus}
+          value={
+            isDomain
+              ? `${address} (${getEllipsisTxt(validatedAddress)})`
+              : validatedAddress || address
+          }
+          onChange={(e) => {
+            updateAddress(e.target.value);
+          }}
+          //disabled={validatedAddress}
+          disableUnderline
+          
+          sx={
+            validatedAddress
+              ? { borderRadius: 1, border: "1px solid rgb(33, 191, 150)" }
+              : { borderRadius: 1, }
+          }
+        />
+      </FormControl>
+    
+    </Box>
   );
 }
 
@@ -133,4 +163,3 @@ function isSupportedDomain(domain) {
     ".blockchain",
   ].some((tld) => domain.endsWith(tld));
 }
-

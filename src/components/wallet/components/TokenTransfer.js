@@ -10,6 +10,9 @@ import {
   Card,
   CardHeader,
   Typography,
+  InputAdornment,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { AddressInput } from "../../address-input";
@@ -20,22 +23,18 @@ import Blockie from "../../blockie";
 import { Address } from "../../address/Address";
 import { CreditCard } from "@mui/icons-material";
 
-
 export const TokenTransfer = () => {
-  const { Moralis } = useMoralis();
+  const { Moralis, chainId } = useMoralis();
   const [receiver, setReceiver] = useState();
   const [asset, setAsset] = useState();
   const [tx, setTx] = useState();
   const [amount, setAmount] = useState();
   const [isPending, setIsPending] = useState(false);
-  
 
   useEffect(() => {
     console.log(asset, amount, receiver);
     asset && amount && receiver ? setTx({ amount, receiver, asset }) : setTx();
   }, [asset, amount, receiver]);
-
-  
 
   let options = {};
   if (tx) {
@@ -57,12 +56,8 @@ export const TokenTransfer = () => {
           awaitReceipt: false,
         };
     }
-    
   }
-  const { fetch, error, isFetching, data } = useWeb3Transfer(options)
-  
-
-  
+  const { fetch, error, isFetching, data } = useWeb3Transfer(options);
 
   return (
     <Card sx={{ alignItems: "center", width: "100%" }}>
@@ -92,44 +87,7 @@ export const TokenTransfer = () => {
             alignItems: "center",
           }}
         >
-          <Typography
-            sx={{
-              maxWidth: "80px",
-              width: "100%",
-            }}
-          >
-            Address:
-          </Typography>
-          
-            <AddressInput autoFocus onChange={setReceiver} />
-          
-          
-        </Box>
-        <Box
-          sx={{
-            marginTop: "20px",
-            display: "flex",
-            alignItems: "center",
-            width: '100%'
-          }}
-        >
-          <Typography
-            sx={{
-              maxWidth: "80px",
-              width: "100%",
-            }}
-          >
-            Amount:
-          </Typography>
-          <FilledInput
-          disableUnderline
-            fullWidth
-            startAdornment={<CreditCard />}
-            onChange={(e) => {
-              console.log(`${e.target.value}`);
-              setAmount(`${e.target.value}`);
-            }}
-          />
+          <AddressInput autoFocus onChange={setReceiver} />
         </Box>
         <Box
           sx={{
@@ -139,15 +97,34 @@ export const TokenTransfer = () => {
             width: "100%",
           }}
         >
-          <Typography
-            sx={{
-              //maxWidth: "80px",
-              width: "100%",
-            }}
-          >
-            Asset:
-          </Typography>
           <AssetSelector setAsset={setAsset} style={{ width: "100%" }} />
+        </Box>
+        <Box
+          sx={{
+            marginTop: "20px",
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          <FormControl variant='filled'>
+            <InputLabel htmlFor="filled-address-input">{chainId}</InputLabel>
+          <FilledInput
+              type="number"
+              step={0.001}
+              disableUnderline
+              fullWidth
+              placeholder='0.00'
+              
+              onChange={(e) => {
+                console.log(`${e.target.value}`);
+                setAmount(`${e.target.value}`);
+              }}
+              sx={{ borderRadius: 1 }}
+            />
+          </FormControl>
+            
+          
         </Box>
         <Button
           color="primary"
@@ -157,14 +134,14 @@ export const TokenTransfer = () => {
             width: "100%",
             marginTop: "25px",
           }}
-          onClick={async() => {
+          onClick={async () => {
             const transaction = await fetch();
             const result = transaction.wait();
             toast.promise(result, {
-                loading: 'Waiting for Transaction',
-                success: 'Transaction Complete',
-                error: 'Error transferring funds'
-            })
+              loading: "Waiting for Transaction",
+              success: "Transaction Complete",
+              error: "Error transferring funds",
+            });
           }}
           disabled={!tx}
         >
