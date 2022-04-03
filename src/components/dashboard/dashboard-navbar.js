@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import {
@@ -24,6 +24,7 @@ import { Bell as BellIcon } from '../../icons/bell';
 import { UserCircle as UserCircleIcon } from '../../icons/user-circle';
 import { Search as SearchIcon } from '../../icons/search';
 import { Users as UsersIcon } from '../../icons/users';
+import { useAuth } from '../../hooks/use-auth';
 import { AvaxLogo, PolygonLogo, BSCLogo, ETHLogo } from "../chains/Logos";
 
 
@@ -211,16 +212,23 @@ const NotificationsButton = () => {
 };
 
 const AccountButton = () => {
+  
+  const { user } = useAuth()
   const anchorRef = useRef(null);
   const [openPopover, setOpenPopover] = useState(false);
-  // To get the user from the authContext, you can use
-  // `const { user } = useAuth();`
-  const user = {
-    avatar: '/static/mock-images/avatars/avatar-anika_visser.png',
-    name: 'Anika Visser'
-  };
+  const [profilePic, setProfilePic] = useState()
+  
+
+  useEffect(() => {
+    if (user) {
+      console.log('we rendered the navbar')
+      setProfilePic(user.attributes.profilePic._url)
+    }
+    
+  }, [user])
 
   const handleOpenPopover = () => {
+    setProfilePic(user.attributes.profilePic._url)
     setOpenPopover(true);
   };
 
@@ -245,7 +253,7 @@ const AccountButton = () => {
             height: 40,
             width: 40
           }}
-          src={user.avatar}
+          src={profilePic}
         >
           <UserCircleIcon fontSize="small" />
         </Avatar>

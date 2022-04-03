@@ -6,16 +6,28 @@ import { useMounted } from '../../../hooks/use-mounted';
 import { SocialPostAdd } from './social-post-add';
 import { SocialPostCard } from './social-post-card';
 import { SocialAbout } from './social-about';
+import { useMoralis } from 'react-moralis';
+import { useAuth } from '../../../hooks/use-auth';
 
 export const SocialTimeline = (props) => {
   const isMounted = useMounted();
   const { profile, ...other } = props;
+  
   const [posts, setPosts] = useState([]);
+  const {Moralis} = useMoralis()
+  
+  
+  
+
+    
 
   const getPosts = useCallback(async () => {
+    
     try {
-      const data = await socialApi.getPosts();
-
+      
+      const data = await socialApi.getPosts()
+      
+      
       if (isMounted()) {
         setPosts(data);
       }
@@ -57,23 +69,30 @@ export const SocialTimeline = (props) => {
           xs={12}
         >
           <SocialPostAdd />
-          {posts.map((post) => (
+          
+          {posts.map((post) => {
+            console.log(post)
+            
+            return (
+              
             <Box
               key={post.id}
               sx={{ mt: 3 }}
             >
+              
               <SocialPostCard
-                authorAvatar={post.author.avatar}
-                authorName={post.author.name}
-                comments={post.comments}
-                createdAt={post.createdAt}
-                isLiked={post.isLiked}
-                likes={post.likes}
-                media={post.media}
-                message={post.message}
+                postId={post.id}
+                authorAvatar={post.attributes.author.avatar}
+                authorName={post.attributes.author.name}
+                comments={post.attributes.comments}
+                createdAt={post.attributes.createdAt}
+                isLiked={post.attributes.isLiked}
+                likes={post.attributes.likes}
+                media={post.attributes.media}
+                message={post.attributes.message}
               />
-            </Box>
-          ))}
+            </Box>)
+          })}
         </Grid>
       </Grid>
     </div>

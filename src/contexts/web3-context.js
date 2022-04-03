@@ -70,16 +70,21 @@ export const AuthProvider = (props) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
+    console.log(user)
+    
     const connectorId = window.localStorage.getItem("connectorId");
-    if (isAuthenticated && !isWeb3Enabled && !isWeb3EnableLoading)
-      enableWeb3({ provider: "web3auth" });
+    if (isAuthenticated && !isWeb3Enabled && !isWeb3EnableLoading) 
+      enableWeb3();
+    
+      
     const initialize = async () => {
       try {
         //const accessToken = window.localStorage.getItem('accessToken');
-        console.log("in Auth Effect", isAuthenticated);
+        
+        console.log('Are we Authenticated', isAuthenticated)
         if (isAuthenticated) {
           //const user = await authApi.me(accessToken);
-
+          
           dispatch({
             type: "INITIALIZE",
             payload: {
@@ -109,18 +114,18 @@ export const AuthProvider = (props) => {
     };
 
     initialize();
-  }, [isAuthenticated]);
+  }, [enableWeb3, isAuthenticated, isWeb3EnableLoading, isWeb3Enabled, user]);
 
   const login = async () => {
     try {
       console.log("in login");
       const user = await authenticate({
-        provider: "web3auth",
+        provider: "web3Auth",
         clientId:
-          "BNxiPDeQfZYkcpv3oVKKwNxzbSycBg8o9B3jNz6x4TFYSq0-mZu3I4WrZ0g5fhQoeMKQFK4-riH1vvTa4GEyFKg",
-        //chainId: Moralis.Chains.ETH_ROPSTEN
+          "BLuDPW99wB8XTXO6rdq40viKddD2A2plHbz2aq3j00pPuBByzS3qvvo2cdFPT7xnPv7-OIm2yiZRCBHjSiGjBIo",
       });
-
+      
+      console.log(user)
       window.localStorage.setItem("connectorId", "web3Auth");
 
       dispatch({

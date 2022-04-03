@@ -43,13 +43,13 @@ const SocialFeed = () => {
         </title>
       </Head>
       <Box
-        component="main"
+        component='main'
         sx={{
           flexGrow: 1,
           py: 8
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth='lg'>
           <Box sx={{ mb: 3 }}>
             <Typography
               color="textSecondary"

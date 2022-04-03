@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -11,18 +12,58 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { useAuth } from '../../../hooks/use-auth'
+import {useMoralis} from 'react-moralis'
 import { UserCircle as UserCircleIcon } from "../../../icons/user-circle";
+import toast, {Toaster} from 'react-hot-toast'
 
 const Input = styled("input")({
   display: "none",
 });
 
 export const AccountGeneralSettings = (props) => {
-  // To get the user from the authContext, you can use
-  // `const { user } = useAuth();`
-  const user = {
-    avatar: "/static/mock-images/avatars/avatar-anika_visser.png",
-    name: "Anika Visser",
+  const {Moralis} = useMoralis()
+  const { user } = useAuth()
+  const [profilePic, setProfilePic] = useState(user.attributes.profilePic._url)
+  const [name, setName] = useState(user.attributes.username)
+  
+
+  useEffect(() => {
+    if (user) {
+      setProfilePic(user.attributes.profilePic._url)
+      setName(user.attributes.username)
+    }
+    
+  }, [user])
+  
+  
+  const changeName = () => {
+    
+    user.set("username", name)
+    user.save()
+    toast.success('User Name Saved')
+  }
+
+  const uploadProfilePic = async (pic) => {
+    
+    const file = new Moralis.File(pic.name, pic)
+    console.log(file)
+    user.set('profilePic', file)
+    const myPromise = user.save()
+    
+    toast.promise(myPromise, {
+      loading: 'Updating..',
+      success: () => {
+        setProfilePic(user.attributes.profilePic._url)
+        return 'Saved Profile Pic'
+      },
+      error: 'Error when saving'
+    })
+    
+  }
+
+  const handleChange = (event) => {
+    setName(event.target.value);
   };
 
   return (
@@ -41,7 +82,7 @@ export const AccountGeneralSettings = (props) => {
                 }}
               >
                 <Avatar
-                  src={user.avatar}
+                  src={profilePic}
                   sx={{
                     height: 64,
                     mr: 2,
@@ -56,9 +97,12 @@ export const AccountGeneralSettings = (props) => {
                     id="save-button-file"
                     multiple
                     type="file"
+                    onChange={(e) => {
+                      uploadProfilePic(e.target.files[0]);
+                    }}
                   />
                   <Button component="span">
-                    Save
+                    Select
                   </Button>
                 </label>
               </Box>
@@ -70,15 +114,16 @@ export const AccountGeneralSettings = (props) => {
                 }}
               >
                 <TextField
-                  defaultValue={user.name}
+                  value={name}
                   label="Full Name"
                   size="small"
                   sx={{
                     flexGrow: 1,
                     mr: 3,
                   }}
+                  onChange={handleChange}
                 />
-                <Button>Save</Button>
+                <Button onClick={changeName}>Save</Button>
               </Box>
               <Box
                 sx={{

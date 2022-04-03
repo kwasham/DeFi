@@ -2,7 +2,6 @@ import NextLink from "next/link";
 import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 import toast from "react-hot-toast";
-
 import {
   Avatar,
   Box,
@@ -22,16 +21,17 @@ import { Address } from "../address/Address";
 import { useMoralis } from "react-moralis";
 
 export const AccountPopover = (props) => {
+  const { user } = useAuth()
   const { account, isAuthenticated } = useMoralis();
   const { anchorEl, onClose, open, ...other } = props;
   const router = useRouter();
   const { logout } = useAuth();
   // To get the user from the authContext, you can use
   //const { user } = useAuth();
-  const user = {
-    avatar: '/static/mock-images/avatars/avatar-anika_visser.png',
-    name: 'Anika Visser'
-  };
+  // const user = {
+  //   avatar: '/static/mock-images/avatars/avatar-anika_visser.png',
+  //   name: 'Anika Visser'
+  // };
 
   const handleLogout = async () => {
     try {
@@ -66,7 +66,7 @@ export const AccountPopover = (props) => {
         }}
       >
         <Avatar
-          src={user.avatar}
+          src={user.attributes.profilePic._url}
           sx={{
             height: 40,
             width: 40,
@@ -81,7 +81,7 @@ export const AccountPopover = (props) => {
             ml: 1,
           }}
         >
-          <Typography variant="body1">{user.name}</Typography>
+          <Typography variant="body1">{user.attributes.username}</Typography>
           <Typography color="textSecondary" variant="body2">
             Acme Inc
           </Typography>
@@ -121,12 +121,6 @@ export const AccountPopover = (props) => {
             />
           </MenuItem>
         </NextLink>
-        <MenuItem>
-          <ListItemIcon>
-          
-            <Address avatar="left" copyable size="6" />
-          </ListItemIcon>
-        </MenuItem>
         <Divider />
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>

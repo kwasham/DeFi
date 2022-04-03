@@ -17,7 +17,7 @@ import {
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { AddressInput } from "../../address-input";
 import { AssetSelector } from "./AssetSelector";
-import { useMoralis, useWeb3Transfer } from "react-moralis";
+import { useMoralis, useWeb3Transfer, useNativeBalance } from "react-moralis";
 import toast from "react-hot-toast";
 import Blockie from "../../blockie";
 import { Address } from "../../address/Address";
@@ -25,19 +25,28 @@ import { CreditCard } from "@mui/icons-material";
 
 export const TokenTransfer = () => {
   const { Moralis, chainId } = useMoralis();
+  // const {nativeToken} = useNativeBalance()
   const [receiver, setReceiver] = useState();
-  const [asset, setAsset] = useState();
+  const [asset, setAsset] = useState({token_address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"});
   const [tx, setTx] = useState();
   const [amount, setAmount] = useState();
+  const [chain, setChain] = useState(chainId)
   const [isPending, setIsPending] = useState(false);
+  
+  console.log("transfer render")
 
   useEffect(() => {
-    console.log(asset, amount, receiver);
+    // console.log(asset, amount, receiver);
+    if(chain != chainId) {
+      setAsset({token_address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"})
+      setChain(chainId)
+    }
     asset && amount && receiver ? setTx({ amount, receiver, asset }) : setTx();
-  }, [asset, amount, receiver]);
-
+  }, [asset, amount, receiver, chainId]);
+  
   let options = {};
   if (tx) {
+    
     switch (asset.token_address) {
       case "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee":
         options = {
@@ -56,6 +65,7 @@ export const TokenTransfer = () => {
           awaitReceipt: false,
         };
     }
+    console.log(options)
   }
   const { fetch, error, isFetching, data } = useWeb3Transfer(options);
 
@@ -97,7 +107,7 @@ export const TokenTransfer = () => {
             width: "100%",
           }}
         >
-          <AssetSelector setAsset={setAsset} style={{ width: "100%" }} />
+          <AssetSelector  asset={asset} setAsset={setAsset} style={{ width: "100%" }} />
         </Box>
         <Box
           sx={{
@@ -108,9 +118,10 @@ export const TokenTransfer = () => {
           }}
         >
           <FormControl variant='filled'>
-            <InputLabel htmlFor="filled-address-input">{chainId}</InputLabel>
+            {/* <InputLabel shrink htmlFor="filled-address-input">{asset.symbol ? asset.symbol : nativeToken.symbol}</InputLabel> */}
           <FilledInput
-              type="number"
+              autoFocus
+              type="tel"
               step={0.001}
               disableUnderline
               fullWidth
@@ -136,8 +147,8 @@ export const TokenTransfer = () => {
           }}
           onClick={async () => {
             const transaction = await fetch();
-            const result = transaction.wait();
-            toast.promise(result, {
+            const result = transaction?.wait();
+            toast?.promise(result, {
               loading: "Waiting for Transaction",
               success: "Transaction Complete",
               error: "Error transferring funds",

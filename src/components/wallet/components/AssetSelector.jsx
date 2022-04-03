@@ -14,26 +14,25 @@ import {
   Typography,
 } from "@mui/material";
 import { useMemo } from "react";
-import { any } from "prop-types";
 
-export function AssetSelector({ setAsset, style }) {
-  const { Moralis, chainId } = useMoralis();
+
+export function AssetSelector({ setAsset, asset }) {
+  const { Moralis } = useMoralis();
   const { assets } = useERC20Balance();
   const {
     data: nativeBalance,
     nativeToken,
     isFetching,
-  } = useNativeBalance({ chain: chainId });
+  } = useNativeBalance();
 
   
-  
-  
+  console.log("render")
 
   const fullBalance = useMemo(() => {
-    console.log('assets', assets, "balance", nativeBalance.balance, 'deci', nativeToken)
-    if (!assets || !nativeBalance) return null;
+    console.log("assets",assets,"balance",nativeBalance.balance,"native Token",nativeToken);
+    if (!assets || !nativeBalance ) return null;
+    console.log("After If")
     return [
-      ...assets,
       {
         balance: nativeBalance.balance,
         decimals: nativeToken?.decimals,
@@ -43,46 +42,50 @@ export function AssetSelector({ setAsset, style }) {
         symbol: nativeToken?.symbol,
         token_address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       },
+      ...assets,
     ];
   }, [assets, nativeBalance, nativeToken]);
+
+  
 
   function handleChange(value) {
     console.log(value.target.value);
     const token = fullBalance.find(
       (token) => token.token_address === value.target.value,
     );
-    console.log(token);
+    console.log("handle Change", token);
     setAsset(token);
   }
-
+  
   return (
-    <Box sx={{ width: "100%"}}>
+    
+    <Box sx={{ width: "100%" }}>
       <FormControl fullWidth variant="filled">
         <InputLabel id="asset-selector-label">Select Asset</InputLabel>
         <Select
           disableUnderline
-          //defaultValue=''
+          
           labelId="asset-selector-label"
           id="asset-selector"
-          //value={}
+          value={ asset.token_address }
           label="Assets"
           onChange={handleChange}
-          sx={{borderRadius: 1}}
+          sx={{ borderRadius: 1, display: "flex", flexDirection: "row" }}
         >
-          {fullBalance &&
-            fullBalance.map((item) => {
-              console.log(item);
-              if (item.balance === undefined) return;
-              return (
-                <MenuList
-                  
+          
+            {fullBalance &&
+              fullBalance.map((item) => {
+                
+                if (item.balance === undefined) return;
+                return (
+                  <MenuList 
                   value={item["token_address"]}
-                  key={item["token_address"]}
+                  key={item['token_address']}
                   sx={{mx: 2}}
-                >
-                  <MenuItem sx={{}}>
+                  >
+                  <MenuItem >
                     <ListItemIcon sx={{}}>
-                      <Avatar 
+                      <Avatar
                         src={
                           item?.logo ||
                           "https://etherscan.io/images/main/empty-token.png"
@@ -95,8 +98,14 @@ export function AssetSelector({ setAsset, style }) {
                         }}
                       />
                     </ListItemIcon>
-                    <ListItemText sx={{marginLeft: -4}}>{item.symbol}</ListItemText>
-                    <Typography variant="body2" color="text.secondary" sx={{marginRight: -2}}>
+                    <ListItemText sx={{ marginLeft: -4 }}>
+                      {item.symbol}
+                    </ListItemText>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ marginRight: -2 }}
+                    >
                       (
                       {parseFloat(
                         Moralis?.Units?.FromWei(item.balance, item.decimals),
@@ -105,8 +114,9 @@ export function AssetSelector({ setAsset, style }) {
                     </Typography>
                   </MenuItem>
                 </MenuList>
-              );
-            })}
+                );
+              })}
+          
         </Select>
       </FormControl>
     </Box>

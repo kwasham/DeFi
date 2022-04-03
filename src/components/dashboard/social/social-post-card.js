@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import NextLink from 'next/link';
 import PropTypes from 'prop-types';
-import { formatDistanceToNowStrict } from 'date-fns';
+import { formatDistanceToNowStrict, format, parseISO, parseJSON } from 'date-fns';
 import {
   Avatar,
   Box,
@@ -21,9 +21,12 @@ import { Clock as ClockIcon } from '../../../icons/clock';
 import { Share as ShareIcon } from '../../../icons/share';
 import { SocialComment } from './social-comment';
 import { SocialCommentAdd } from './social-comment-add';
+import { useMounted } from '../../../hooks/use-mounted';
+
 
 export const SocialPostCard = (props) => {
   const {
+    postId,
     authorAvatar,
     authorName,
     comments,
@@ -34,9 +37,31 @@ export const SocialPostCard = (props) => {
     message,
     ...other
   } = props;
+
+  console.log('media', media)
+
+  const date = parseJSON(createdAt)
+  const isMounted = useMounted();
   const [expandMedia, setExpandMedia] = useState(false);
+  const [comment, setComment] = useState([])
   const [isLiked, setIsLiked] = useState(isLikedProp);
   const [likes, setLikes] = useState(likesProp);
+
+  const getComments = useCallback(async () => {
+    try {
+      const data = await comments.query().ascending('createdAt').find()
+
+      if (isMounted()) {
+        setComment(data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }, [comments, isMounted])
+
+  useEffect(() => {
+    getComments()
+  }, [getComments])
 
   const handleLike = () => {
     setIsLiked(true);
@@ -80,7 +105,7 @@ export const SocialPostCard = (props) => {
               sx={{ ml: '6px' }}
               variant="caption"
             >
-              {formatDistanceToNowStrict(createdAt)}
+              {formatDistanceToNowStrict(date)}
               {' '}
               ago
             </Typography>
@@ -108,7 +133,7 @@ export const SocialPostCard = (props) => {
               sx={{ ml: 0.5 }}
               variant="body2"
             >
-              updated her status
+              updated his status
             </Typography>
           </Box>
         )}
@@ -126,7 +151,7 @@ export const SocialPostCard = (props) => {
           <Box sx={{ mt: 3 }}>
             <CardActionArea onClick={() => setExpandMedia(true)}>
               <CardMedia
-                image={media}
+                image={media._url}
                 sx={{
                   backgroundPosition: 'top',
                   height: 500
@@ -172,17 +197,19 @@ export const SocialPostCard = (props) => {
           </IconButton>
         </Box>
         <Divider sx={{ my: 3 }} />
-        {comments.map((comment) => (
+        {comment.map((comment) => 
+          
+          (
           <SocialComment
-            authorAvatar={comment.author.avatar}
-            authorName={comment.author.name}
-            createdAt={comment.createdAt}
+            authorAvatar={comment.attributes.author.avatar}
+            authorName={comment.attributes.author.name}
+            createdAt={comment.attributes.createdAt}
             key={comment.id}
-            message={comment.message}
+            message={comment.attributes.message}
           />
         ))}
         <Divider sx={{ my: 3 }} />
-        <SocialCommentAdd />
+        <SocialCommentAdd postId={props.postId}/>
       </Box>
     </Card>
   );
@@ -191,10 +218,11 @@ export const SocialPostCard = (props) => {
 SocialPostCard.propTypes = {
   authorAvatar: PropTypes.string.isRequired,
   authorName: PropTypes.string.isRequired,
-  comments: PropTypes.array.isRequired,
-  createdAt: PropTypes.number.isRequired,
+  comments: PropTypes.object.isRequired,
+  //createdAt: PropTypes.,
   isLiked: PropTypes.bool.isRequired,
   likes: PropTypes.number.isRequired,
   media: PropTypes.string,
-  message: PropTypes.string
+  message: PropTypes.string,
+  postId: PropTypes.string
 };

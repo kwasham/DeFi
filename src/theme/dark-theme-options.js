@@ -9,11 +9,11 @@ const neutral = {
   600: '#4B5563',
   700: '#374151',
   800: '#1F2937',
-  900: '#111827'
+  900: '#242526'
 };
 
 const background = {
-  default: '#0B0F19',
+  default: '#18191a',
   paper: neutral[900]
 };
 

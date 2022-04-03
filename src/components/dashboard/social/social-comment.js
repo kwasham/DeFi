@@ -70,6 +70,6 @@ export const SocialComment = (props) => {
 SocialComment.propTypes = {
   authorAvatar: PropTypes.string.isRequired,
   authorName: PropTypes.string.isRequired,
-  createdAt: PropTypes.number.isRequired,
+  //createdAt: PropTypes.number.isRequired,
   message: PropTypes.string.isRequired
 };
