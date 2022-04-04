@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { blueGrey } from '@mui/material/colors';
 import AddPhotoIcon from '@mui/icons-material/AddPhotoAlternate';
-import { socialApi } from '../../../__fake-api__/social-api';
+import { socialApi } from '../../../__fake-api__/social-Api';
 import { AuthGuard } from '../../../components/authentication/auth-guard';
 import { DashboardLayout } from '../../../components/dashboard/dashboard-layout';
 import { SocialConnections } from '../../../components/dashboard/social/social-connections';
@@ -44,7 +44,7 @@ export const SocialProfile = () => {
   const getProfile = useCallback(async () => {
     try {
       const data = await socialApi.getProfile();
-
+      console.log(data)
       if (isMounted()) {
         setProfile(data);
       }

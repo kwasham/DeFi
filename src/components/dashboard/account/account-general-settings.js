@@ -16,6 +16,7 @@ import { useAuth } from '../../../hooks/use-auth'
 import {useMoralis} from 'react-moralis'
 import { UserCircle as UserCircleIcon } from "../../../icons/user-circle";
 import toast, {Toaster} from 'react-hot-toast'
+import { ConstructionOutlined } from "@mui/icons-material";
 
 const Input = styled("input")({
   display: "none",
@@ -23,38 +24,34 @@ const Input = styled("input")({
 
 export const AccountGeneralSettings = (props) => {
   const {Moralis} = useMoralis()
-  const { user } = useAuth()
-  const [profilePic, setProfilePic] = useState(user.attributes.profilePic._url)
-  const [name, setName] = useState(user.attributes.username)
+  const { user, profile } = useAuth()
   
+  const [profilePic, setProfilePic] = useState(profile.attributes.avatar._url)
+  const [name, setName] = useState(profile.attributes.name)
+  console.log('here is your profile', profile)
 
-  useEffect(() => {
-    if (user) {
-      setProfilePic(user.attributes.profilePic._url)
-      setName(user.attributes.username)
-    }
-    
-  }, [user])
-  
   
   const changeName = () => {
     
-    user.set("username", name)
-    user.save()
+    profile.set('name', name)
+    profile.save()
     toast.success('User Name Saved')
   }
 
   const uploadProfilePic = async (pic) => {
     
     const file = new Moralis.File(pic.name, pic)
-    console.log(file)
-    user.set('profilePic', file)
-    const myPromise = user.save()
+    
+    profile.set('avatar', file)
+    
+    // myProfile = await myProfile.save()
+    // user.set('profile', myProfile)
+    const myPromise = profile.save()
     
     toast.promise(myPromise, {
       loading: 'Updating..',
       success: () => {
-        setProfilePic(user.attributes.profilePic._url)
+        setProfilePic(profile.attributes.avatar._url)
         return 'Saved Profile Pic'
       },
       error: 'Error when saving'

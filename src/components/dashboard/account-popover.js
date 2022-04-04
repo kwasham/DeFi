@@ -21,7 +21,7 @@ import { Address } from "../address/Address";
 import { useMoralis } from "react-moralis";
 
 export const AccountPopover = (props) => {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { account, isAuthenticated } = useMoralis();
   const { anchorEl, onClose, open, ...other } = props;
   const router = useRouter();
@@ -66,7 +66,7 @@ export const AccountPopover = (props) => {
         }}
       >
         <Avatar
-          src={user.attributes.profilePic._url}
+          src={profile?.attributes?.avatar?._url}
           sx={{
             height: 40,
             width: 40,

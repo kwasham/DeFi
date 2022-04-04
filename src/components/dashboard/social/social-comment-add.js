@@ -12,7 +12,7 @@ import Moralis from 'moralis'
 export const SocialCommentAdd = (props) => {
   const textInput = useRef(null);
   const [message, setMessage] = useState()
-  const {user} = useAuth()
+  const {user, profile} = useAuth()
   // To get the user from the authContext, you can use
   // `const { user } = useAuth();`
   // const user = {
@@ -23,7 +23,7 @@ export const SocialCommentAdd = (props) => {
   
   const author = {
     id: user.id,
-    avatar: user.attributes.profilePic._url,
+    avatar: profile.attributes.avatar._url,
     name: user.attributes.username,
   };
 
@@ -56,7 +56,7 @@ export const SocialCommentAdd = (props) => {
     <div {...props}>
       <Box sx={{ display: 'flex' }}>
         <Avatar
-          src={user.attributes.profilePic._url}
+          src={profile.attributes.avatar._url}
           sx={{
             height: 40,
             mr: 2,

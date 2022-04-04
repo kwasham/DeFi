@@ -6,26 +6,29 @@ const initialState = {
   isAuthenticated: false,
   isInitialized: false,
   user: null,
+  profile: null,
 };
 
 const handlers = {
   INITIALIZE: (state, action) => {
-    const { isAuthenticated, user } = action.payload;
+    const { isAuthenticated, user, profile } = action.payload;
 
     return {
       ...state,
       isAuthenticated,
       isInitialized: true,
       user,
+      profile,
     };
   },
   LOGIN: (state, action) => {
-    const { user } = action.payload;
+    const { user, profile } = action.payload;
 
     return {
       ...state,
       isAuthenticated: true,
       user,
+      profile,
     };
   },
   LOGOUT: (state) => ({
@@ -66,6 +69,7 @@ export const AuthProvider = (props) => {
     Moralis,
     logout: moralisLogout,
   } = useMoralis();
+  
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -83,13 +87,15 @@ export const AuthProvider = (props) => {
         
         console.log('Are we Authenticated', isAuthenticated)
         if (isAuthenticated) {
-          //const user = await authApi.me(accessToken);
-          
+          const profile = user.get('profile')
+          await profile.fetch()
+          console.log(profile)
           dispatch({
             type: "INITIALIZE",
             payload: {
               isAuthenticated: true,
               user,
+              profile,
             },
           });
         } else {
@@ -98,6 +104,7 @@ export const AuthProvider = (props) => {
             payload: {
               isAuthenticated: false,
               user: null,
+              profile: null,
             },
           });
         }
@@ -108,6 +115,7 @@ export const AuthProvider = (props) => {
           payload: {
             isAuthenticated: false,
             user: null,
+            profile: null,
           },
         });
       }
@@ -132,6 +140,7 @@ export const AuthProvider = (props) => {
         type: "LOGIN",
         payload: {
           user,
+          profile,
         },
       });
     } catch (e) {

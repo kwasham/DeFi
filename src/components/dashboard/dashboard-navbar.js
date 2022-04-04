@@ -213,22 +213,23 @@ const NotificationsButton = () => {
 
 const AccountButton = () => {
   
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
+  console.log(profile?.attributes?.avatar?._url)
   const anchorRef = useRef(null);
   const [openPopover, setOpenPopover] = useState(false);
-  const [profilePic, setProfilePic] = useState()
+  const [profilePic, setProfilePic] = useState(profile?.attributes?.avatar?._url)
   
 
   useEffect(() => {
     if (user) {
       console.log('we rendered the navbar')
-      setProfilePic(user.attributes.profilePic._url)
+      setProfilePic(profile?.attributes?.avatar?._url)
     }
     
   }, [user])
 
   const handleOpenPopover = () => {
-    setProfilePic(user.attributes.profilePic._url)
+    setProfilePic(profile?.attributes?.avatar?._url)
     setOpenPopover(true);
   };
 
